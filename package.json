@@ -1,6 +1,6 @@
 {
   "name": "@vizoai/cli",
-  "version": "0.0.0-alpha.13",
+  "version": "0.0.0-alpha.26",
   "description": "VizoAI CLI",
   "type": "module",
   "bin": {
@@ -14,6 +14,10 @@
     "start": "node ./bin/vizoai.js",
     "dev": "tsup --watch",
     "build": "tsup"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
     "@vercel/build-utils": "^8.4.5",
