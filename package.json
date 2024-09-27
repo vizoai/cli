@@ -1,0 +1,31 @@
+{
+  "name": "@vizoai/cli",
+  "version": "0.0.0-alpha.8",
+  "description": "VizoAI CLI",
+  "type": "module",
+  "bin": {
+    "vizoai": "./bin/vizoai.js"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "start": "node ./bin/vizoai.js",
+    "dev": "tsup --watch",
+    "build": "tsup"
+  },
+  "dependencies": {
+    "@vercel/build-utils": "^8.4.5",
+    "@vercel/ncc": "^0.38.2",
+    "cac": "^6.7.14",
+    "esbuild": "^0.24.0",
+    "fast-glob": "^3.3.2",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.2"
+  }
+}
