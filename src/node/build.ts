@@ -5,8 +5,16 @@ import ncc from '@vercel/ncc';
 
 type VercelRuntime = "node" | "edge";
 
+export interface BuildOptions {
+  output: string;
+  vercel: boolean;
+  entry: string;
+  root: string;
+  staticDir: string;
+}
+
 class Builder {
-  constructor(private root: string, private opts: { output: string, vercel: boolean }) {
+  constructor(private root: string, private opts: Omit<BuildOptions, 'root'>) {
     this.root = root;
     this.opts = opts;
   }
@@ -20,7 +28,7 @@ class Builder {
           src: ".*",
           dest: "_serverless",
         },
-      ],
+      ] as any[],
       overrides: {},
     };
 
@@ -40,7 +48,8 @@ class Builder {
     const targetPath = this.opts.vercel ? path.join(this.root, '.vercel/output/functions/_serverless.func') : this.opts.output;
     fs.removeSync(targetPath);
     fs.ensureDirSync(targetPath);
-    const { code, assets } = await ncc(path.join(this.root, 'src/main.ts'), {
+    fs.copySync(this.opts.staticDir, path.join(this.root, ".vercel/output/static"), { overwrite: true });
+    const { code, assets } = await ncc(path.join(this.root, this.opts.entry), {
       minify: false,
       // sourceMap: true,
       sourceMap: false,
@@ -72,7 +81,9 @@ class Builder {
         spaces: 2,
         encoding: 'utf-8',
       });
-      configJson.routes
+      configJson.routes.unshift({
+				handle: "filesystem",
+      })
       fs.writeJsonSync(path.join(vercelOutput, 'config.json'), configJson, {
         spaces: 2,
         encoding: 'utf-8',
@@ -82,11 +93,14 @@ class Builder {
   }
 }
 
-export async function build(root: string, opts: { output: string, vercel: boolean }) {
-  const config = {
-    root,
+export async function build(opts: BuildOptions) {
+  const config: BuildOptions = {
+    ...opts,
+    staticDir: path.resolve(opts.staticDir),
+    root: opts.root,
     output: path.resolve(opts.output ?? 'dist'),
     vercel: opts.vercel ?? process.env.VERCEL ?? false,
+    entry: opts.entry,
   }
   const builder = new Builder(config.root, config);
   await builder.build();
